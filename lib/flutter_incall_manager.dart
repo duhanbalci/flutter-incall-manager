@@ -22,7 +22,7 @@ class IncallManager {
   Future<void> start(
       {bool auto = true,
       MediaType media = MediaType.AUDIO,
-      String ringback}) async {
+      String? ringback}) async {
     await _channel.invokeMethod('start', <String, dynamic>{
       'media': media == MediaType.AUDIO ? 'audio' : 'video',
       'auto': auto,
@@ -31,7 +31,7 @@ class IncallManager {
   }
 
   /// Stop InCallManager
-  Future<void> stop({String busytone}) async {
+  Future<void> stop({String? busytone}) async {
     await _channel
         .invokeMethod('stop', <String, dynamic>{'busytone': busytone});
   }
@@ -123,87 +123,87 @@ class IncallManager {
   }
 
   /// Check record permission.
-  Future<String> checkRecordPermission() async {
-    String response = "unknow";
+  Future<String?> checkRecordPermission() async {
+    String? response = "unknow";
     try {
-      response = await _channel.invokeMethod('checkRecordPermission');
+      response = await (_channel.invokeMethod('checkRecordPermission') as FutureOr<String>);
     } catch (e) {}
 
     return response;
   }
 
   /// Request record permission.
-  Future<String> requestRecordPermission() async {
-    String response = "unknow";
+  Future<String?> requestRecordPermission() async {
+    String? response = "unknow";
     try {
-      response = await _channel.invokeMethod('requestRecordPermission');
+      response = await (_channel.invokeMethod('requestRecordPermission') as FutureOr<String>);
     } catch (e) {}
 
     return response;
   }
 
   /// Check camera permission.
-  Future<String> checkCameraPermission() async {
-    String response = "unknow";
+  Future<String?> checkCameraPermission() async {
+    String? response = "unknow";
     try {
-      response = await _channel.invokeMethod('checkCameraPermission');
+      response = await (_channel.invokeMethod('checkCameraPermission') as FutureOr<String>);
     } catch (e) {}
 
     return response;
   }
 
   /// Request camera permission.
-  Future<String> requestCameraPermission() async {
-    String response = "unknow";
+  Future<String?> requestCameraPermission() async {
+    String? response = "unknow";
     try {
-      response = await _channel.invokeMethod('requestCameraPermission');
+      response = await (_channel.invokeMethod('requestCameraPermission') as FutureOr<String>);
     } catch (e) {}
 
     return response;
   }
 
-  final StreamController<bool> onProximity = StreamController.broadcast();
-  final StreamController<String> onAudioDeviceChanged =
+  final StreamController<bool?> onProximity = StreamController.broadcast();
+  final StreamController<String?> onAudioDeviceChanged =
       StreamController.broadcast();
-  final StreamController<String> onAudioFocusChange =
+  final StreamController<String?> onAudioFocusChange =
       StreamController.broadcast();
-  final StreamController<String> onMediaButton = StreamController.broadcast();
+  final StreamController<String?> onMediaButton = StreamController.broadcast();
 
   void eventListener(dynamic data) {
     Map<dynamic, dynamic> event = data as Map<dynamic, dynamic>;
     print('Event ${event['event']} => ${event.toString()}');
     switch (event['event']) {
       case 'WiredHeadset': //wire headset is plugged
-        bool isPlugged = event['isPlugged'];
-        bool hasMic = event['hasMic'];
-        String deviceName = event['deviceName'];
+        bool? isPlugged = event['isPlugged'];
+        bool? hasMic = event['hasMic'];
+        String? deviceName = event['deviceName'];
         print(
             "WiredHeadset:isPlugged:$isPlugged hasMic:$hasMic deviceName:$deviceName");
         break;
       case 'Proximity':
-        bool isNear = event['isNear'];
+        bool? isNear = event['isNear'];
         onProximity.add(isNear);
         break;
       /* ----- For Android only ------ */
       case 'NoisyAudio': //noisy audio
-        String status = event['status'];
+        String? status = event['status'];
         print("NoisyAudio:status:$status");
         break;
       case 'MediaButton':
-        String eventText = event['eventText'];
-        int eventCode = event['eventCode'];
+        String? eventText = event['eventText'];
+        int? eventCode = event['eventCode'];
         onMediaButton.add(eventText);
         break;
       case 'onAudioFocusChange':
-        String eventText = event['eventText'];
-        bool eventCode = event['eventCode'] is int
+        String? eventText = event['eventText'];
+        bool? eventCode = event['eventCode'] is int
             ? event['eventCode'] > 0
             : event['eventCode'];
         onAudioFocusChange.add(eventText);
         break;
       case 'onAudioDeviceChanged':
-        String availableAudioDeviceList = event['availableAudioDeviceList'];
-        String selectedAudioDevice = event['selectedAudioDevice'];
+        String? availableAudioDeviceList = event['availableAudioDeviceList'];
+        String? selectedAudioDevice = event['selectedAudioDevice'];
         onAudioDeviceChanged.add(selectedAudioDevice);
         break;
       /* ----- For Android only ------ */
